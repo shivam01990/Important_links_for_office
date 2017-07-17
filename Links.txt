@@ -31,3 +31,39 @@ https://code.google.com/archive/p/cwpfsamples/downloads
 http://www.codeproject.com/Articles/617868/Scribble-WPF-InkCanvas-Application-Using-PRISM-MVV
 Sardar No-9807174924
 bikasul cabadex
+
+ public class WebStartup
+    {
+        private const string WebContentRoot = @"content";
+
+        public static void Configuration(IAppBuilder appBuilder)
+        {
+            var options = new FileServerOptions { FileSystem = new PhysicalFileSystem(WebContentRoot) };
+            appBuilder.UseFileServer(options);
+        }
+    }
+    
+    
+     internal class Program : Application
+    {
+        private const string LocalAddress = "http://localhost:9000/";
+
+        [STAThread]
+        public static void Main(string[] args)
+        {
+            var assemblyInformationalVersionAttribute = Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+            var title = $"test {assemblyInformationalVersionAttribute?.InformationalVersion ?? "---"}";
+
+            using (WebApp.Start(LocalAddress, Configure))
+            using (var window = new ProgramWindow(title, "Fluke.Biomedical.demo"))
+            {
+                new Program().Run(window);
+            }
+        }
+
+        private static void Configure(IAppBuilder appBuilder)
+        {
+            new ApiStartup().Configuration(appBuilder);
+            WebStartup.Configuration(appBuilder);
+        }
+    }
